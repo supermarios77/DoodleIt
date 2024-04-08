@@ -8,5 +8,3 @@ Here's the deal: the app tosses you a hint about something amazing to draw, and 
 Say goodbye to boring drawing prompts – this is an artistic adventure like no other! Jump into our app, unleash your creativity, and let the good times roll! 🎢✨ Are you up for the challenge? Get ready to sketch, guess, and conquer the artistic universe! 🚀🎨
 
 -------
-
-## **🌈How To Run The App On Your Local Machine?🔥**
