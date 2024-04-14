@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoodleIt</title>
+  <!-- Load TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>DoodleIt: TensorFlow-Powered Drawing Application</h1>
+  <button id="start-game-btn">Start Game</button>
+  <div id="game" style="display: none;">
+    <canvas id="canvas" width="400" height="400" style="border:1px solid black;"></canvas>
+    <p id="hint"></p>
+    <p id="prediction"></p>
+    <p id="timer"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
