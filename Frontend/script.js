@@ -29,9 +29,6 @@ let predictedClass; // Predicted class variable
 // Add event listener for the clear canvas button
 document.getElementById('clear-canvas-btn').addEventListener('click', clearCanvas);
 
-// Add event listener for the start game button
-document.getElementById('start-game-btn').addEventListener('click', startGame);
-
 // Define a function to clear the canvas
 function clearCanvas() {
     const canvas = document.getElementById('canvas');
@@ -39,13 +36,11 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-// Function to speak text using the SpeechSynthesis API
 function speakText(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     speechSynthesis.speak(utterance);
 }
 
-// Load the TensorFlow model
 async function loadModel() {
     try {
         model = await tf.loadLayersModel(MODEL_URL);
@@ -55,12 +50,11 @@ async function loadModel() {
     }
 }
 
-// Display the hint for the current object
 function displayHint() {
     const hintElement = document.getElementById('hint');
     const currentObject = remainingHints[currentHintIndex];
     const currentHint = hints[currentObject];
-    hintElement.textContent = `Draw a ${currentObject}. Hint: ${currentHint}`;
+    hintElement.textContent = 'Draw a ' + currentObject + '. Hint: ' + currentHint;
 
     // Restart the timer for each new hint
     restartTimer();
@@ -72,7 +66,6 @@ function displayHint() {
     clearSpokenText();
 }
 
-// Make a prediction based on the drawing
 async function predict(canvas) {
     // Preprocess the canvas drawing
     const preprocessedData = await preprocessData(canvas);
@@ -90,7 +83,7 @@ async function predict(canvas) {
     return predictedClass;
 }
 
-// Preprocess the canvas drawing data
+// Preprocessing function for live data
 async function preprocessData(canvas) {
     try {
         // Convert the canvas drawing to an image
@@ -126,44 +119,57 @@ async function preprocessData(canvas) {
     }
 }
 
-// Start the drawing process
-function startDrawing() {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+// Start the game
+function startGame() {
+    document.getElementById('start-game-btn').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+    loadModel().then(startDrawing);
 
-    // Ensure canvas size is fixed
-    canvas.width = 400;
-    canvas.height = 400;
-
-    let isDrawing = false;
-
-    canvas.addEventListener('mousedown', () => {
-        isDrawing = true;
-    });
-
-    canvas.addEventListener('mousemove', (event) => {
-        if (isDrawing) {
-            draw(event.offsetX, event.offsetY, ctx);
-        }
-    });
-
-    canvas.addEventListener('mouseup', () => {
-        isDrawing = false;
-        evaluateDrawing(canvas);
-    });
-
-    // Display the first hint after a delay
-    setTimeout(() => {
-        displayHint();
-    }, 2000);
+    // Start the timer
+    startTimer();
 }
 
-// Draw on the canvas
-function draw(x, y, ctx) {
-    ctx.fillStyle = 'white';
-    ctx.beginPath();
-    ctx.arc(x, y, 10, 0, Math.PI * 2);
-    ctx.fill();
+function startTimer() {
+    const timerElement = document.getElementById('timer');
+    let timeLeft = 30; // 30 seconds timer
+    timer = setInterval(() => {
+        if (timeLeft > 0) {
+            timerElement.textContent = 'Time left: ' + timeLeft + 's';
+            timeLeft--;
+        } else {
+            clearInterval(timer);
+            timerElement.textContent = 'Time\'s up!';
+            evaluateDrawingTimeout();
+        }
+    }, 1000);
+}
+
+function restartTimer() {
+    clearInterval(timer);
+    startTimer();
+}
+
+// Evaluate the drawing when the timer reaches zero
+function evaluateDrawingTimeout() {
+    const hintElement = document.getElementById('hint');
+    const predictionElement = document.getElementById('prediction');
+
+    // Check if the hint has already been spoken
+    if (!hintSpoken) {
+        const currentHint = hints[remainingHints[currentHintIndex]];
+        hintElement.textContent = `Hint: ${currentHint}`;
+
+        // Speak out loud the time's up message and the correct object
+        speakText(`Time's up! The correct object was ${remainingHints[currentHintIndex]}`);
+        
+        // Set the flag to true to indicate that the hint has been spoken
+        hintSpoken = true;
+    }
+    
+    predictionElement.textContent = 'Time\'s up!';
+
+    // Display the results after a short delay
+    setTimeout(displayResults, 2000);
 }
 
 // Evaluate the drawing
@@ -174,8 +180,14 @@ async function evaluateDrawing(canvas) {
     const currentHint = hints[remainingHints[currentHintIndex]];
     hintElement.textContent = `Hint: ${currentHint}`;
 
-    // Speak out loud the hint
-    speakText(`Hint: ${currentHint}`);
+    // Check if the hint has already been spoken
+    if (!hintSpoken) {
+        // Speak out loud the hint
+        speakText(`Hint: ${currentHint}`);
+        
+        // Set the flag to true to indicate that the hint has been spoken
+        hintSpoken = true;
+    }
 
     // Make prediction
     predictedClass = await predict(canvas);
@@ -190,6 +202,9 @@ async function evaluateDrawing(canvas) {
 
         currentHintIndex++;
 
+        // Reset the flag for the next hint
+        hintSpoken = false;
+
         // Clear the canvas after 2 seconds
         setTimeout(() => {
             clearCanvas();
@@ -202,95 +217,9 @@ async function evaluateDrawing(canvas) {
 
     // If no hints remaining or time's up, display the correct answer
     if (currentHintIndex >= hintsPerGame || remainingHints.length === 0) {
-        clearTimeout(timer); // Stop the timer
+        clearInterval(timer); // Stop the timer
         timesUp();
     } else {
         displayHint(); // Display the next hint
     }
-}
-
-// Start the game
-function startGame() {
-    // Hide the start button and show the game elements
-    document.getElementById('start-game-btn').style.display = 'none';
-    document.getElementById('game').style.display = 'block';
-
-    // Load the model and start drawing
-    loadModel().then(startDrawing);
-
-    // Start the timer
-    startTimer();
-}
-
-// Start the timer
-function startTimer() {
-    const timerElement = document.getElementById('timer');
-    let timeLeft = 30; // 30 seconds timer
-    timer = setInterval(() => {
-        if (timeLeft > 0) {
-            timerElement.textContent = `Time left: ${timeLeft}s`;
-            timeLeft--;
-        } else {
-            clearInterval(timer);
-            timerElement.textContent = 'Time\'s up!';
-            evaluateDrawingTimeout();
-        }
-    }, 1000);
-}
-
-// Restart the timer
-function restartTimer() {
-    clearInterval(timer);
-    startTimer();
-}
-
-// Handle timeout scenario
-function evaluateDrawingTimeout() {
-    const hintElement = document.getElementById('hint');
-    const predictionElement = document.getElementById('prediction');
-
-    const currentHint = hints[remainingHints[currentHintIndex]];
-    hintElement.textContent = `Hint: ${currentHint}`;
-    predictionElement.textContent = `Time's up! The correct object was: ${remainingHints[currentHintIndex]}`;
-    currentHintIndex++;
-
-    // Speak out loud the time's up message and the correct object
-    speakText(`Time's up! The correct object was ${remainingHints[currentHintIndex - 1]}`);
-
-    // Display the results after a short delay
-    setTimeout(displayResults, 2000);
-}
-
-// Clear the "Time's Up" message
-function clearTimesUp() {
-    const hintElement = document.getElementById('hint');
-    hintElement.textContent = `Hint: ${hints[remainingHints[currentHintIndex]]}`;
-    speakText(`Hint: ${hints[remainingHints[currentHintIndex]]}`);
-}
-
-// Clear the spoken text
-function clearSpokenText() {
-    const spokenTextElement = document.getElementById('spoken-text');
-    spokenTextElement.textContent = '';
-}
-
-// Display the results
-function displayResults() {
-    let results = 'Results:\n';
-    for (let i = 0; i < hintsPerGame; i++) {
-        const object = remainingHints[i];
-        if (object) {
-            results += `${object}: ${object === predictedClass ? 'Correct' : 'Incorrect'}\n`;
-        }
-    }
-    alert(results);
-}
-
-// Function to shuffle an array
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
