@@ -117,7 +117,7 @@ function startDrawing() {
 }
 
 function draw(x, y, ctx) {
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.beginPath();
     ctx.arc(x, y, 10, 0, Math.PI * 2);
     ctx.fill();
