@@ -1,9 +1,22 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+}
+
+h1 {
+    font-family: 'Permanent Marker', cursive;
+    text-align: center;
 }
 
 canvas {
     border: 1px solid black;
-    margin-bottom: 10px;
     background-color: black;
+}
+
+button {
+    display: block;
+    margin: 10px auto;
+}
+
+#game {
+    text-align: center;
 }
