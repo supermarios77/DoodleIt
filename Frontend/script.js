@@ -25,6 +25,7 @@ const hintsPerGame = 4; // Number of hints per game
 let remainingHints = shuffle(Object.keys(hints)); // Shuffle the hints array
 let correctGuesses = 0; // Counter for correct guesses
 let predictedClass; // Predicted class variable
+let hintSpoken = false; // Flag to check if hint has been spoken
 
 // Add event listener for the clear canvas button
 document.getElementById('clear-canvas-btn').addEventListener('click', clearCanvas);
@@ -154,72 +155,50 @@ function evaluateDrawingTimeout() {
     const hintElement = document.getElementById('hint');
     const predictionElement = document.getElementById('prediction');
 
-    // Check if the hint has already been spoken
+    // Check if the hint has been spoken already
     if (!hintSpoken) {
         const currentHint = hints[remainingHints[currentHintIndex]];
-        hintElement.textContent = `Hint: ${currentHint}`;
+        hintElement.textContent = 'Hint: ' + currentHint;
+        speakText('Hint: ' + currentHint);
 
-        // Speak out loud the time's up message and the correct object
-        speakText(`Time's up! The correct object was ${remainingHints[currentHintIndex]}`);
-        
-        // Set the flag to true to indicate that the hint has been spoken
+        // Set the hint spoken flag to true
         hintSpoken = true;
     }
-    
-    predictionElement.textContent = 'Time\'s up!';
+
+    predictionElement.textContent = 'Time\'s up! The correct object was: ' + remainingHints[currentHintIndex];
+    currentHintIndex++;
 
     // Display the results after a short delay
     setTimeout(displayResults, 2000);
 }
 
-// Evaluate the drawing
-async function evaluateDrawing(canvas) {
+function clearTimesUp() {
     const hintElement = document.getElementById('hint');
-    const predictionElement = document.getElementById('prediction');
+    hintElement.textContent = 'Hint: ' + hints[remainingHints[currentHintIndex]];
+    speakText('Hint: ' + hints[remainingHints[currentHintIndex]]);
+}
 
-    const currentHint = hints[remainingHints[currentHintIndex]];
-    hintElement.textContent = `Hint: ${currentHint}`;
+function clearSpokenText() {
+    const spokenTextElement = document.getElementById('spoken-text');
+    spokenTextElement.textContent = '';
+}
 
-    // Check if the hint has already been spoken
-    if (!hintSpoken) {
-        // Speak out loud the hint
-        speakText(`Hint: ${currentHint}`);
-        
-        // Set the flag to true to indicate that the hint has been spoken
-        hintSpoken = true;
+function displayResults() {
+    let results = 'Results:\n';
+    for (let i = 0; i < hintsPerGame; i++) {
+        const object = remainingHints[i];
+        if (object) {
+            results += object + ': ' + (object === predictedClass ? 'Correct' : 'Incorrect') + '\n';
+        }
     }
+    alert(results);
+}
 
-    // Make prediction
-    predictedClass = await predict(canvas);
-
-    // Speak out loud the predicted class
-    speakText(`We think you are drawing ${predictedClass}`);
-
-    if (predictedClass === remainingHints[currentHintIndex]) {
-        // Correct guess
-        predictionElement.textContent = `Correct! You drew a ${predictedClass}`;
-        correctGuesses++;
-
-        currentHintIndex++;
-
-        // Reset the flag for the next hint
-        hintSpoken = false;
-
-        // Clear the canvas after 2 seconds
-        setTimeout(() => {
-            clearCanvas();
-            predictionElement.textContent = '';
-        }, 2000);
-    } else {
-        // Incorrect guess
-        predictionElement.textContent = `Keep drawing to match the hint. We think you are drawing ${predictedClass}`;
+// Shuffle function
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-
-    // If no hints remaining or time's up, display the correct answer
-    if (currentHintIndex >= hintsPerGame || remainingHints.length === 0) {
-        clearInterval(timer); // Stop the timer
-        timesUp();
-    } else {
-        displayHint(); // Display the next hint
-    }
+    return array;
 }
