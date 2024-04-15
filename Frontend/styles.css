@@ -7,14 +7,19 @@ h1 {
     text-align: center;
 }
 
-canvas {
+#canvas {
     border: 1px solid black;
     background-color: black;
+    border-radius: 20px;
 }
 
 button {
     display: block;
     margin: 10px auto;
+    border: transparent;
+    padding: 18px;
+    font-size: 14px;
+    border-radius: 20px;
 }
 
 #game {
