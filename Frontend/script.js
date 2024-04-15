@@ -150,17 +150,11 @@ async function evaluateDrawing(canvas) {
     if (predictedClass === remainingHints[currentHintIndex]) {
         predictionElement.textContent = 'Correct! You drew a ' + predictedClass;
         correctGuesses++;
-
-        currentHintIndex++;
-
-        // Clear the canvas after 2 seconds
-        setTimeout(() => {
-            clearCanvas();
-            predictionElement.textContent = '';
-        }, 2000);
     } else {
-        predictionElement.textContent = 'Keep drawing to match the hint. We think you are drawing ' + predictedClass;
+        predictionElement.textContent = 'Incorrect! The correct object was: ' + remainingHints[currentHintIndex];
     }
+
+    currentHintIndex++;
 
     // If no hints remaining or time's up, display the correct answer
     if (currentHintIndex >= hintsPerGame || remainingHints.length === 0) {
