@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DelicousHandrawn } from '@/app/ui/fonts';
+import { jua } from '@/app/ui/fonts';
 import "./ui/globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={DelicousHandrawn.className}>{children}</body>
+      <body className={jua.className}>{children}</body>
     </html>
   );
 }
