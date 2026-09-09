@@ -1,10 +1,29 @@
-# 🌈 DoodleIt ✏️
--------
+# DoodleIt
 
-Get ready for an awesome sketching adventure with our super cool TensorFlow-powered app! 🚀🎨 Ever wished for a drawing challenge that's as exciting as a Theme Park Ride? Well, guess what? You've just found it! 🌟
+TensorFlow-powered sketch guessing game with timed drawing challenges
 
-Here's the deal: the app tosses you a hint about something amazing to draw, and you've got a quick 30 seconds to turn it into a masterpiece. But here's the twist that makes it even more thrilling – the app spills the beans on all the features of the mystery thing, and it's up to you to figure out what it is! 🕵️‍♂️
+> **Not maintained.** This project is no longer actively developed.
 
-Say goodbye to boring drawing prompts – this is an artistic adventure like no other! Jump into our app, unleash your creativity, and let the good times roll! 🎢✨ Are you up for the challenge? Get ready to sketch, guess, and conquer the artistic universe!. 🚀🎨
+## Demo
 
--------
+Live at [doodle-it.vercel.app](https://doodle-it.vercel.app)
+
+## Overview
+
+The app gives you a hint about something to draw, then you have 30 seconds to sketch it. As you draw, the app reveals features of the mystery object one by one. Your job is to guess what it is before time runs out.
+
+## Features
+
+- **AI-generated hints:** TensorFlow picks a mystery object and provides drawing prompts.
+- **Timed challenge:** 30-second drawing window with a countdown.
+- **Progressive reveals:** features of the mystery object are uncovered as you draw.
+- **Guess mechanic:** guess the object based on revealed features before time expires.
+
+## Tech stack
+
+- **Machine learning:** TensorFlow
+- **Language:** Python, Jupyter Notebook
+
+## License
+
+Other
